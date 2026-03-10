@@ -1,227 +1,116 @@
+
+
 document.getElementById("create-item").addEventListener("click", clickCi);
-
-
 function clickCi() {
-    document.body.style.overflow = "hidden";
 
-    const main = document.querySelector("main");
-       let ans = document.getElementById("ans");
+   // Modificações no body
+   document.body.style.overflow = "hidden";
 
-    const quest = document.createElement("div");
-    quest.id = "list";
-     main.appendChild(quest);
+   const main = document.querySelector("main");
+   let ans = document.getElementById("ans");
+   
+   let quest = document.createElement("div");
+   quest.id = "list";
+    main.appendChild(quest);
 
-    const blur = document.createElement("div");
-    blur.classList.add("blur");
-     main.appendChild(blur);
+   let blur = document.createElement("div");
+   blur.classList.add("blur");
+    main.appendChild(blur);
 
-        const listCloseWrapper = document.createElement("span");
-        listCloseWrapper.id = "list-close-wrapper";
-         quest.appendChild(listCloseWrapper);
+   // Formulário
+   quest.innerHTML = `
+      <span id="list-close-wrapper">
+         <button id="list-close"></button>
+      </span>
+      <form id="form">
+         <span id="ipt-title-wrapper">
+            <label id="ipt-title-label" for="ipt-title">Titulo</label>
+            <input id="ipt-title" type="text" required>
+         </span>
+         <span id="ipt-text-wrapper">
+            <label id="ipt-text-label" for="ipt-text">
+               Anotação
+               <textarea id="ipt-text" cols="30" rows="10" required></textarea>
+            </label>
+         </span>
+         <span id="ipt-date-wrapper">
+            <label id="ipt-date-label" for="ipt-date">Data de conclusão</label>
+            <input id="ipt-date" type="date" required>
+         </span>
+         <span id="ipt-radio-wrapper">
+            <p id="ipt-radio-title">Prioridade</p>
+            <div id="ipt-radio-container">
+               <span class="ipt-radio-section">
+                  <label id="ipt-radio-1-label" for="ipt-radio-1">Alta</label>
+                  <input id="ipt-radio-1" name="pri" value="alta" type="radio" required>
+               </span>
+               <span class="ipt-radio-section">
+                  <label id="ipt-radio-2-label" for="ipt-radio-2">Média</label>
+                  <input id="ipt-radio-2" name="pri" value="média" type="radio" required>
+               </span>
+               <span class="ipt-radio-section">
+                  <label id="ipt-radio-3-label" for="ipt-radio-3">Baixa</label>
+                  <input id="ipt-radio-3" name="pri" value="baixa" type="radio" required>
+               </span>
+            </div>
+         </span>
+      </form>
+      <span id="cl-se-btn-wrapper">
+         <input id="clean" class="btn" type="reset" value="Limpar" form="form">
+         <button id="send" class="btn" type="submit" form="form">Enviar</button>
+      </span>
+   `
+   const listClose = document.getElementById("list-close");
+   const form = document.getElementById("form");
+   const iptTitle = document.getElementById("ipt-title");
+   const iptText = document.getElementById("ipt-text");
+   const iptDate = document.getElementById("ipt-date");
+   iptDate.min = new Date().toISOString().split("T")[0];
 
-            const listClose = document.createElement("button");
-            listClose.id = "list-close";
-             listCloseWrapper.appendChild(listClose);
+   // Função fechar
+   function fecharModal(quest, blur) {
+      document.body.style.overflow = "auto";
+      quest.remove();
+      blur.remove();
+   };
+   listClose.addEventListener("click", () => fecharModal(quest, blur));
 
-        document.getElementById("list-close").addEventListener("click", clickClose);
-        function clickClose() {
-            document.body.style.overflow = "auto";
-            quest.remove();
-            blur.remove();
-        };
-    
-    const form = document.createElement("form");
-    form.id = "form";
-     quest.appendChild(form);
+   // Função enviar
+   form.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-            const iptTitleWrapper = document.createElement("span");
-            iptTitleWrapper.id = "ipt-title-wrapper";
-             form.appendChild(iptTitleWrapper);
+      let cardObj = {
+         titulo: iptTitle.value,
+         texto: iptText.value,
+         data: iptDate.value, 
+         pri: document.querySelector('input[name="pri"]:checked').value,
+      };
 
-                const iptTitleLabel = document.createElement("label");
-                iptTitleLabel.id = "ipt-title-label";
-                iptTitleLabel.textContent = "Titulo";
-                iptTitleLabel.htmlFor = "ipt-title";
-                 iptTitleWrapper.appendChild(iptTitleLabel);
+      const card = document.createElement("div");
+      card.classList.add("card");
+       ans.appendChild(card);
 
-                const iptTitle = document.createElement("input");
-                iptTitle.id = "ipt-title";
-                iptTitle.type = "text";
-                iptTitle.required = true;
-                 iptTitleWrapper.appendChild(iptTitle);
+      card.innerHTML = `
+         <span id="card-top-wrapper">
+            <h1 id="card-title">${cardObj.titulo}</h1>
+            <p id="card-text">${cardObj.texto}</p>
+         </span>
 
-            const iptTextWrapper = document.createElement("span");
-            iptTextWrapper.id = "ipt-text-wrapper";
-             form.appendChild(iptTextWrapper);
+         <span id="card-bottom-wrapper">
+            <p id="card-pri">${cardObj.pri}</p>
+            <p id="card-date">${cardObj.data.split('-').reverse().join('/')}</p>
+         </span>
+      `
 
-                const iptTextLabel = document.createElement("label");
-                iptTextLabel.id = "ipt-text-label";
-                iptTextLabel.textContent = "Anotação";
-                iptTextLabel.htmlFor = "ipt-text";
-                 iptTextWrapper.appendChild(iptTextLabel);
-                
-                const iptText = document.createElement("textarea");
-                iptText.cols = "30"; iptText.rows = "10";
-                iptText.id = "ipt-text";
-                iptText.required = true;
-                 iptTextLabel.appendChild(iptText);
+      const cardPri = card.querySelector("#card-pri");
+      if(cardObj.pri === "alta") {
+         cardPri.classList.add("card-pri-red");
+      } else if (cardObj.pri === "média") {
+         cardPri.classList.add("card-pri-yellow");
+      } else {
+         cardPri.classList.add("card-pri-green");
+      }; 
 
-            const iptDateWrapper = document.createElement("span");
-            iptDateWrapper.id = "ipt-date-wrapper";
-             form.appendChild(iptDateWrapper);
-
-                const iptDateLabel = document.createElement("label");
-                iptDateLabel.id = "ipt-date-label";
-                iptDateLabel.textContent = "Data de conclusão";
-                iptDateLabel.htmlFor = "ipt-date";
-                 iptDateWrapper.appendChild(iptDateLabel);
-
-                const iptDate = document.createElement("input");
-                iptDate.id = "ipt-date";
-                iptDate.type = "date";
-                iptDate.required = true;
-                iptDate.min = new Date().toISOString().split('T')[0];
-                 iptDateWrapper.appendChild(iptDate);
-                
-            const iptRadioWrapper = document.createElement("span");
-            iptRadioWrapper.id = "ipt-radio-wrapper";
-             form.appendChild(iptRadioWrapper);
-            
-                const iptRadioTitle = document.createElement("p");
-                iptRadioTitle.id = "ipt-radio-title";
-                iptRadioTitle.textContent = "Prioridade";
-                 iptRadioWrapper.appendChild(iptRadioTitle);
-
-                const iptRadioContainer = document.createElement("div");
-                iptRadioContainer.id = "ipt-radio-container";
-                 iptRadioWrapper.appendChild(iptRadioContainer);
-
-                    const iptRadioSection = document.createElement("span");
-                    iptRadioSection.classList.add("ipt-radio-section");
-                     iptRadioContainer.appendChild(iptRadioSection);
-
-                        const iptRadio1Label = document.createElement("label");
-                        iptRadio1Label.id = "ipt-radio-1-label";
-                        iptRadio1Label.htmlFor = "ipt-radio-1";
-                        iptRadio1Label.textContent = "Alta";
-                         iptRadioSection.appendChild(iptRadio1Label);
-
-                        const iptRadio1 = document.createElement("input");
-                        iptRadio1.id = "ipt-radio-1";
-                        iptRadio1.name = "pri";
-                        iptRadio1.value = "alta"
-                        iptRadio1.type = "radio";
-                        iptRadio1.required = true;
-                         iptRadioSection.appendChild(iptRadio1);
-
-                    const iptRadioSection2 = document.createElement("span");
-                    iptRadioSection2.classList.add("ipt-radio-section");
-                     iptRadioContainer.appendChild(iptRadioSection2);
-
-                        const iptRadio2Label = document.createElement("label");
-                        iptRadio2Label.id = "ipt-radio-2-label";
-                        iptRadio2Label.htmlFor = "ipt-radio-2";
-                        iptRadio2Label.textContent = "Média";
-                         iptRadioSection2.appendChild(iptRadio2Label);
-
-                        const iptRadio2 = document.createElement("input");
-                        iptRadio2.id = "ipt-radio-2";
-                        iptRadio2.name = "pri";
-                        iptRadio2.value = "média"
-                        iptRadio2.type = "radio";
-                        iptRadio2.required = true;
-                         iptRadioSection2.appendChild(iptRadio2);
-
-                    const iptRadioSection3 = document.createElement("span");
-                    iptRadioSection3.classList.add("ipt-radio-section");
-                     iptRadioContainer.appendChild(iptRadioSection3);
-                    
-                        const iptRadio3Label = document.createElement("label");
-                        iptRadio3Label.id = "ipt-radio-3-label";
-                        iptRadio3Label.htmlFor = "ipt-radio-3";
-                        iptRadio3Label.textContent = "Baixa";
-                         iptRadioSection3.appendChild(iptRadio3Label);
-
-                        const iptRadio3 = document.createElement("input");
-                        iptRadio3.id = "ipt-radio-3";
-                        iptRadio3.name = "pri";
-                        iptRadio3.value = "baixa"
-                        iptRadio3.type = "radio";
-                        iptRadio3.required = true;
-                         iptRadioSection3.appendChild(iptRadio3);
-
-    const clSeBtnWrapper = document.createElement("span");
-    clSeBtnWrapper.id = "cl-se-btn-wrapper";
-     list.appendChild(clSeBtnWrapper);
-
-        const clean = document.createElement("input");
-        clean.id = "clean";
-        clean.classList.add("btn");
-        clean.setAttribute("form", "form")
-        clean.value = "Limpar";
-        clean.type = "reset";
-         clSeBtnWrapper.appendChild(clean);
-
-        const send = document.createElement("button");
-        send.id = "send";
-        send.type = "submit";
-        send.setAttribute("form", "form");
-        send.classList.add("btn");
-        send.textContent = "Enviar";
-         clSeBtnWrapper.appendChild(send);
-
-
-        form.addEventListener("submit", (e) => {
-            e.preventDefault();
-
-            const cardObj = {
-               titulo: iptTitle.value,
-               texto: iptText.value,
-               data: iptDate.value, 
-               pri: document.querySelector('input[name="pri"]:checked').value,
-            };
-
-            let card = document.createElement("div");
-            card.classList.add("card");
-             ans.appendChild(card);
-
-               let cardTopBox = document.createElement("span");
-               cardTopBox.id = "card-top-wrapper";
-                card.appendChild(cardTopBox);
-
-               let cardTitle = document.createElement("h1");
-               cardTitle.textContent = cardObj.titulo;
-               cardTitle.id = "card-title";
-                cardTopBox.appendChild(cardTitle)
-
-               let cardText = document.createElement("p");
-               cardText.textContent = cardObj.texto;
-               cardText.id = "card-text";
-                cardTopBox.appendChild(cardText);
-
-               let cardBottomBox = document.createElement("span");
-               cardBottomBox.id = "card-bottom-wrapper";
-                card.appendChild(cardBottomBox);
-               
-               let cardPri = document.createElement("p");
-               cardPri.textContent = cardObj.pri;
-               cardPri.id = "card-pri";
-                cardBottomBox.appendChild(cardPri); 
-
-               let cardDate = document.createElement("p");
-               cardDate.textContent = cardObj.data.split('-').reverse().join('/');
-               cardDate.id = "card-date";
-                cardBottomBox.appendChild(cardDate);
-
-               if(cardObj.pri === "alta") {
-                  cardPri.classList.add("card-pri-red");
-               } else if (cardObj.pri === "média") {
-                  cardPri.classList.add("card-pri-yellow");
-               } else {
-                  cardPri.classList.add("card-pri-green");
-               }; 
-            quest.remove();
-            blur.remove();
-        });
+      fecharModal(quest, blur);
+   }); 
 };
-
